@@ -1,0 +1,913 @@
+ <!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رحلة بطل الصناعة في الوطن العربي</title>
+    <style>
+        :root {
+            --primary-green: #1a5c38;
+            --light-green: #27ae60;
+            --bg-yellow: #fef9e7;
+            --card-bg: #ffffff;
+            --text-dark: #2c3e50;
+            --danger-red: #c0392b;
+            --accent-orange: #d35400;
+        }
+
+        body {
+            font-family: 'Cairo', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e8f8f0, #fef9e7);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 950px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            overflow: hidden;
+            padding: 30px;
+            box-sizing: border-box;
+            text-align: center;
+            border: 4px solid var(--primary-green);
+            position: relative;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-green);
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .btn {
+            background-color: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            margin-top: 15px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            background-color: #124026;
+            transform: scale(1.05);
+        }
+
+        .panel {
+            display: none;
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        .hero-avatar {
+            font-size: 5rem;
+            margin: 10px 0;
+        }
+
+        .instructions-box {
+            text-align: right;
+            background: #fdfefe;
+            border: 2px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 15px 0;
+        }
+
+        .instruction-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            background: #f8f9f9;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border-right: 4px solid var(--primary-green);
+        }
+
+        .instruction-number {
+            background: var(--primary-green);
+            color: white;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            margin-left: 15px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .matching-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .matching-column h4 {
+            background: var(--primary-green);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .match-item {
+            background: #fdfefe;
+            border: 2px solid #bdc3c7;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 1.1rem;
+        }
+
+        .match-item:hover {
+            border-color: var(--light-green);
+            background: #e8f8f0;
+        }
+
+        .match-item.selected {
+            background: var(--light-green);
+            color: white;
+            border-color: var(--primary-green);
+        }
+
+        .match-item.matched {
+            background: #e8f8f0;
+            border-color: var(--light-green);
+            color: var(--primary-green);
+            font-weight: bold;
+        }
+
+        .question-box {
+            background: #f9f9f9;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: right;
+            border-right: 6px solid var(--primary-green);
+            border-top: 1px solid #eee;
+            border-left: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            text-align: right;
+        }
+
+        .options-list li {
+            background: #fff;
+            border: 2px solid #d5dbdb;
+            padding: 14px 18px;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.1rem;
+        }
+
+        .options-list li:hover {
+            border-color: var(--light-green);
+            background: #f0f9f4;
+        }
+
+        .options-list li.selected {
+            background: var(--light-green);
+            color: white;
+            border-color: var(--primary-green);
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .feedback.correct {
+            color: var(--light-green);
+        }
+
+        .feedback.wrong {
+            color: var(--danger-red);
+        }
+
+        .score-badge {
+            display: inline-block;
+            background: var(--accent-orange);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .badge-icon {
+            font-size: 4rem;
+            margin: 15px 0;
+        }
+
+        .game-header-title {
+            font-size: 2rem;
+            color: var(--primary-green);
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .game-sub-title {
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+
+        .review-box {
+            text-align: right;
+            max-height: 300px;
+            overflow-y: auto;
+            background: #fdfefe;
+            border: 2px solid #e2e8f0;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+        }
+
+        .review-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-right: 5px solid;
+        }
+
+        .review-item.correct-ans {
+            background: #e8f8f0;
+            border-color: var(--light-green);
+        }
+
+        .review-item.wrong-ans {
+            background: #fdedec;
+            border-color: var(--danger-red);
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+
+    <!-- شاشة البداية -->
+    <div id="welcome-panel" class="panel active">
+        <div class="hero-avatar">👷‍♂️</div>
+        <div class="game-header-title">🏭 رحلة بطل الصناعة في الوطن العربي 🌟</div>
+        <div class="game-sub-title">💡 بالعلم نصنع مستقبل أفضل 🚀</div>
+        <p>👋 أهلاً بك أيها البطل!</p>
+        <p>🎯 استعد لخوض رحلة ممتعة للتعرف على الصناعة في الوطن العربي.</p>
+        <p style="color: var(--accent-orange); font-weight: bold;">🏆 الدرجة النهائية: 58 درجة</p>
+        <button class="btn" onclick="showInstructions()">ابدأ الرحلة 🚀</button>
+    </div>
+
+    <!-- شاشة تعليمات اللعبة -->
+    <div id="instructions-panel" class="panel">
+        <div class="hero-avatar">📋</div>
+        <h2>📜 تعليمات اللعبة</h2>
+        <p><strong>👋 أهلاً بك أيها البطل!</strong> استعد لخوض رحلة ممتعة للتعرف على الصناعة في الوطن العربي.</p>
+        
+        <div class="instructions-box">
+            <div class="instruction-item">
+                <div class="instruction-number">1</div>
+                <div>📊 تتكون اللعبة من 3 مستويات، ويجب إكمالها بالترتيب.</div>
+            </div>
+            <div class="instruction-item">
+                <div class="instruction-number">2</div>
+                <div>🔗 المستوى الأول: التوصيل، ويتكون من 3 أسئلة، باجمالي 6 درجات، ويجب إجابة جميع الأسئلة الثلاثة بنجاح للانتقال للمستوى الثاني.</div>
+            </div>
+            <div class="instruction-item">
+                <div class="instruction-number">3</div>
+                <div>✅ المستوى الثاني: صح أم خطأ، ويتكون من 5 أسئلة، باجمالي 10 درجات، ويجب النجاح في 3 أسئلة على الأقل للانتقال للمستوى الثالث.</div>
+            </div>
+            <div class="instruction-item">
+                <div class="instruction-number">4</div>
+                <div>🧠 المستوى الثالث: الاختيار من متعدد، ويتكون من 21 سؤالاً، باجمالي 42 درجة، ويجب النجاح في 15 سؤالاً على الأقل للدخول إلى النهاية والنتيجة.</div>
+            </div>
+            <div class="instruction-item">
+                <div class="instruction-number">5</div>
+                <div>⭐ تحصل على درجتين عند الإجابة الصحيحة عن كل سؤال.</div>
+            </div>
+            <div class="instruction-item">
+                <div class="instruction-number">6</div>
+                <div>💡 في الشريحتين الأخيرتين، ستظهر لك مراجعة شاملة لجميع إجاباتك (التوصيل، صح وخطأ، والاختيار من متعدد) مع النتيجة النهائية.</div>
+            </div>
+            <div class="instruction-item">
+                <div class="instruction-number">7</div>
+                <div>🔄 يتم تغيير وترتيب الأسئلة عشوائياً في كل مرة تبدأ فيها من جديد!</div>
+            </div>
+            <div class="instruction-item">
+                <div class="instruction-number">8</div>
+                <div>🏆 احرص على إكمال جميع المستويات للحصول على الشارات وجمع أكبر عدد من الدرجات.</div>
+            </div>
+        </div>
+
+        <div style="margin-top: 15px;">
+            <span class="score-badge">🏆 الدرجة النهائية: 58 درجة</span>
+        </div>
+        <div>
+            <button class="btn" onclick="showLevel1Intro()">ابدأ المستوى الأول 🎮</button>
+        </div>
+    </div>
+
+    <!-- شاشة تمهيد المستوى الأول -->
+    <div id="level-1-intro" class="panel">
+        <div class="hero-avatar">🔗</div>
+        <div class="score-badge">🥇 المستوى الأول</div>
+        <h2>رابط المعلومات</h2>
+        <h3 style="color: var(--text-dark);">📌 نشاط التوصيل</h3>
+        <p><strong>📊 عدد الأسئلة:</strong> 3 | <strong>⭐ إجمالي الدرجات:</strong> 6 درجات</p>
+        <p>🎯 صل كل معلومة بما يناسبها .. وكن أول من يصل إلى النهاية 🏁</p>
+        <button class="btn" onclick="startLevel(1)">ابدأ المستوى 🚀</button>
+    </div>
+
+    <!-- شاشة اللعب: المستوى الأول -->
+    <div id="level-1-panel" class="panel">
+        <div class="score-badge">🥇 المستوى الأول: رابط المعلومات</div>
+        <p>🔗 صل كل معلومة بما يناسبها. (💡 يمكنك الضغط على أي عبارة موصولة لتعديلها بمفردها)</p>
+        <div class="matching-grid">
+            <div class="matching-column">
+                <h4>📝 العبارات (اليمين)</h4>
+                <div id="l1-right-side"></div>
+            </div>
+            <div class="matching-column">
+                <h4>🎯 الخيارات (اليسار)</h4>
+                <div id="l1-left-side"></div>
+            </div>
+        </div>
+        <div style="margin-top: 20px;">
+            <button id="l1-submit-btn" class="btn" style="display:none;" onclick="checkLevel1Final()">تأكيد الإجابات ✅</button>
+        </div>
+    </div>
+
+    <!-- شاشة نتيجة المستوى الأول -->
+    <div id="level-1-result" class="panel">
+        <div id="l1-badge" class="badge-icon" style="display:none;">🥇</div>
+        <h2 id="l1-result-title"></h2>
+        <p id="l1-result-desc"></p>
+        <button id="l1-action-btn" class="btn"></button>
+    </div>
+
+    <!-- شاشة تمهيد المستوى الثاني -->
+    <div id="level-2-intro" class="panel">
+        <div class="hero-avatar">🔍</div>
+        <div class="score-badge">🥈 المستوى الثاني</div>
+        <h2>كاشف الحقيقة الصناعية</h2>
+        <h3 style="color: var(--text-dark);">✅ صح أم خطأ ❌</h3>
+        <p><strong>📊 عدد الأسئلة:</strong> 5 | <strong>⭐ الدرجة:</strong> 10 درجات</p>
+        <p>📖 اقرأ العبارة جيدًا، ثم اختر ما إذا كانت صحيحة أم خاطئة.</p>
+        <button class="btn" onclick="startLevel(2)">ابدأ المستوى 🎮</button>
+    </div>
+
+    <!-- شاشة اللعب: المستوى الثاني -->
+    <div id="level-2-panel" class="panel">
+        <div class="score-badge">🥈 المستوى الثاني: كاشف الحقيقة الصناعية</div>
+        <div id="q2-container"></div>
+    </div>
+
+    <!-- شاشة نتيجة المستوى الثاني -->
+    <div id="level-2-result" class="panel">
+        <div id="l2-badge" class="badge-icon" style="display:none;">🥈</div>
+        <h2 id="l2-result-title"></h2>
+        <p id="l2-result-desc"></p>
+        <button id="l2-action-btn" class="btn"></button>
+    </div>
+
+    <!-- شاشة تمهيد المستوى الثالث -->
+    <div id="level-3-intro" class="panel">
+        <div class="hero-avatar">🧠</div>
+        <div class="score-badge">🥉 المستوى الثالث</div>
+        <h2>خبير الصناعة</h2>
+        <h3 style="color: var(--text-dark);">📌 اختيار من متعدد</h3>
+        <p><strong>📊 عدد الأسئلة:</strong> 21 | <strong>⭐ إجمالي الدرجات:</strong> 42 درجة (كل سؤال درجتان)</p>
+        <p>💡 فكر جيدا ... اقرأ السؤال والخيارات جيدا قبل الإجابة.</p>
+        <button class="btn" onclick="startLevel(3)">ابدأ المستوى 🚀</button>
+    </div>
+
+    <!-- شاشة اللعب: المستوى الثالث -->
+    <div id="level-3-panel" class="panel">
+        <div class="score-badge">🥉 المستوى الثالث: خبير الصناعة</div>
+        <div id="q3-container"></div>
+    </div>
+
+    <!-- شاشة نتيجة المستوى الثالث -->
+    <div id="level-3-result" class="panel">
+        <div id="l3-badge" class="badge-icon" style="display:none;">🥉</div>
+        <h2 id="l3-result-title"></h2>
+        <p id="l3-result-desc"></p>
+        <button id="l3-action-btn" class="btn"></button>
+    </div>
+
+    <!-- شاشة مراجعة الأخطاء الشاملة (الشريحة قبل الأخيرة) -->
+    <div id="global-review-panel" class="panel">
+        <div class="hero-avatar">📋</div>
+        <h2>مراجعة الأخطاء والإجابات الشاملة</h2>
+        <p>إليك مراجعة كاملة لجميع إجاباتك (نشاط التوصيل، صح وخطأ، والاختيار من متعدد):</p>
+        <div id="global-review-list" class="review-box"></div>
+        <button class="btn" onclick="showFinalPanelFromReview()">الانتقال لشريحة النهاية الكلية 🏆</button>
+    </div>
+
+    <!-- شاشة النهاية الكلية (الشريحة الأخيرة) -->
+    <div id="final-panel" class="panel">
+        <div class="badge-icon">🏆</div>
+        <h1>🎉 النهاية 🎉</h1>
+        <h2>🌟 مبروك يا بطل الصناعة 🌟</h2>
+        <p>👏 لقد وصلت إلى نهاية رحلتك بنجاح باهر.</p>
+        <p>🚀 أحسنت رحلتك تكللت بالنجاح. مستقبل الصناعة الآن في يديك.</p>
+        <p id="final-score-text" style="font-size: 1.4rem; font-weight: bold; color: var(--primary-green); margin: 20px 0;"></p>
+        
+        <h3 style="margin-top: 25px;">📊 سجل إجاباتك الكامل في اللعبة:</h3>
+        <div id="final-summary-list" class="review-box" style="max-height: 200px;"></div>
+
+        <button class="btn" onclick="restartGame()">🔄 إعادة اللعبة من جديد</button>
+    </div>
+
+</div>
+
+<script>
+    let totalScore = 0;
+
+    const baseLevel1Pairs = [
+        { id: 0, right: "تشتهر منطقة الخليج العربي بشكل كبير على أي صناعات؟", left: "الصناعات البترولية والبتروكيميائية" },
+        { id: 1, right: "من المقومات البشرية للصناعة؟", left: "رءوس الاموال" },
+        { id: 2, right: "تشترك منطقتا شمال إفريقيا وبلاد الشام في ماذا؟", left: "الغزل والنسيج والصناعات الغذائية" }
+    ];
+
+    const baseLevel2Data = [
+        { q: "تعد المواد الخام من المقومات الطبيعية للصناعة.", ans: true, expl: "لان المواد الخام من المقومات الطبيعية للصناعة." },
+        { q: "تعتبر الصناعة من الركائز الأساسية لتقدم الشعوب ورفاهية الإنسان لانها تساهم في الدخل القومي.", ans: true, expl: "لأنها تساهم في زيادة الدخل القومي ورفاهية الإنسان." },
+        { q: "تساهم الصناعة بشكل مباشر في تحسين مستوى المعيشة من خلال التركيز علي البحث العلمي فقط.", ans: false, expl: "لأن الصناعة تحسن مستوى المعيشة من خلال توفير فرص العمل وزيادة الإنتاج وليس البحث العلمي فقط." },
+        { q: "من التحديات البشرية التي تواجه الصناعة في الوطن العربي نقص العمالة المدربة علي التكنولوجيا الحديثة.", ans: true, expl: "لأن نقص العمالة المدربة على التكنولوجيا الحديثة يُعدّ من التحديات البشرية." },
+        { q: "من التحديات التي تواجه الصناعة تصنيع المواد الخام بدلا من تصديرها.", ans: false, expl: "لأن المشكلة هي تصدير المواد الخام بدلاً من تصنيعها لعدم القدرة على التصنيع." }
+    ];
+
+    const baseLevel3Data = [
+        { q: "هي عملية تحويل المواد الخام إلي منتجات لتلبية احتياجات الإنسان اليومية:", options: ["التجارة", "الصناعة", "الاقتصاد", "كل ما سبق"], answerText: "الصناعة", expl: "الصناعة هي عملية تحويل المواد الخام إلى منتجات." },
+        { q: "تعدد المقومات الطبيعية للصناعة ومنها:", options: ["رءوس الاموال", "الايدي العامله", "الاسواق المحليه", "الموقع الجغرافي"], answerText: "الموقع الجغرافي", expl: "الموقع الجغرافي من المقومات الطبيعية." },
+        { q: "تعدد المقومات البشرية للصناعة ومنها:", options: ["الايدي العامله", "المناخ", "الموقع الجغرافي", "الطقس"], answerText: "الايدي العامله", expl: "الأيدي العاملة من المقومات البشرية." },
+        { q: "الصناعة التي تعتمد على استخراج المعادن ومصادر الطاقة من باطن الأرض هي:", options: ["التحويليه", "الاستهلاكيه", "الاستخراجيه", "الحديثه"], answerText: "الاستخراجيه", expl: "الصناعة الاستخراجية تعتمد على استخراج المعادن ومصادر الطاقة." },
+        { q: "تعد صناعة 'الغزل والنسيج' من الأمثلة على الصناعات:", options: ["الاستخراجيه", "التحويليه", "الحديثه", "الاستهلاكيه"], answerText: "التحويليه", expl: "الغزل والنسيج صناعة تحويلية." },
+        { q: "أي مما يلي يُصنف كصناعة 'حديثة (تكنولوجية)':", options: ["التحويليه", "الفوسفات", "صناعه الملابس", "صناعة الإلكترونيات"], answerText: "صناعة الإلكترونيات", expl: "صناعة الإلكترونيات تصنف صناعة حديثة." },
+        { q: "الصناعات التي ترتبط مباشرة بحياة المواطن واحتياجاته اليومية مثل 'الأغذية' تسمى:", options: ["التحويليه", "الاستهلاكيه", "الاستخراجيه", "الحديثه"], answerText: "الاستهلاكيه", expl: "الصناعات الاستهلاكية ترتبط مباشرة باحتياجات المواطن اليومية." },
+        { q: "تمثل صناعة تكرير البترول والغاز الطبيعي المصدر الرئيسي للدخل القومي في دولتي:", options: ["لبنان وسوريا", "تونس والمغرب", "السعودية والكويت", "مصر والسودان"], answerText: "السعودية والكويت", expl: "السعودية والكويت تعتمدان على تكرير البترول." },
+        { q: "تعد 'الصناعات الغذائية' من أهم الصناعات في الوطن العربي لأنها:", options: ["تعتمد على القطن والكتان", "تمثل المصدر الرئيسي للدخل القومي", "تعتبر أساس مشروعات التعمير العمراني", "توفر احتياجات السكان وتحقق الأمن الغذائي"], answerText: "توفر احتياجات السكان وتحقق الأمن الغذائي", expl: "توفر احتياجات السكان وتحقق الأمن الغذائي." },
+        { q: "تعتمد صناعة 'الغزل والنسيج' بشكل أساسي على:", options: ["مشروعات البناء والتعمير", "تكرير البترول", "القطن والكتان والألياف النباتية", "الحديد والصلب"], answerText: "القطن والكتان والألياف النباتية", expl: "تعتمد على القطن والكتان والألياف النباتية." },
+        { q: "الصناعة التي تعتبر 'الأساس لمشروعات البناء والتعمير' هي:", options: ["صناعة تكرير البترول", "صناعة الغزل والنسيج", "الصناعات الغذائية", "صناعة الحديد والصلب والأسمنت"], answerText: "صناعة الحديد والصلب والأسمنت", expl: "صناعة الحديد والصلب والأسمنت أساس البناء." },
+        { q: "أي من الدول التالية تعد مثالاً لمناطق تركز الصناعة في منطقة 'بلاد الشام':", options: ["سوريا والأردن", "الكويت والمغرب", "السعودية والإمارات", "مصر والجزائر"], answerText: "سوريا والأردن", expl: "سوريا والأردن في بلاد الشام." },
+        { q: "تشتهر منطقة 'الخليج العربي' بشكل أساسي بصناعة:", options: ["الغزل والنسيج", "صناعة الأثاث", "الصناعات الغذائية فقط", "الصناعات البترولية والبتروكيميائية"], answerText: "الصناعات البترولية والبتروكيميائية", expl: "الصناعات البترولية والبتروكيميائية." },
+        { q: "تشترك منطقتا 'شمال إفريقيا' و'بلاد الشام' في وجود صناعة:", options: ["البتروكيمياويات", "الطائرات والسفن", "الغزل والنسيج والصناعات الغذائية", "استخراج الفحم"], answerText: "الغزل والنسيج والصناعات الغذائية", expl: "الغزل والنسيج والصناعات الغذائية." },
+        { q: "كم دولة توجد في شمال إفريقيا تقوم للصناعات الغذائية وصناعة الغزل والنسيج:", options: ["دولتين", "اربعة دول", "ثلاث دول", "عشرة دول"], answerText: "ثلاث دول", expl: "ثلاث دول." },
+        { q: "تعتبر الصناعة من الركائز الأساسية لتقدم الشعوب ورفاهيتها لأنها تساهم في:", options: ["تقليل الاعتماد علي التكنولوجيا", "زيادة استيراد المنتجات من الخارج", "زيادة الدخل القومي", "تقليل عدد الوظائف المتاحه"], answerText: "زيادة الدخل القومي", expl: "زيادة الدخل القومي." },
+        { q: "تساهم الصناعة بشكل مباشر في تحسين مستوى المعيشة من خلال:", options: ["تصدير المواد الخام", "الاعتماد على الصناعات البدائية", "توفير فرص عمل للشباب", "التركيز على البحث العلمي فقط"], answerText: "توفير فرص عمل للشباب", expl: "توفير فرص عمل للشباب." },
+        { q: "أي مما يلي يُصنف كصناعة 'مفتاح صناعة المستقبل' وفقاً لما ورد في قيم أتعلمها:", options: ["زيادة إنتاج المواد الخام", "استيراد العمالة الأجنبية", "الإبداع والابتكار والبحث العلمي", "إهمال البنية التحتية"], answerText: "الإبداع والابتكار والبحث العلمي", expl: "الإبداع والابتكار والبحث العلمي." },
+        { q: "من التحديات البشرية التي تواجه الصناعة في الوطن العربي:", options: ["نقص العمالة المدربة على التكنولوجيا الحديثة", "كثرة الاستثمارات في البحث العلمي", "قوة البنية التحتية في كل الدول العربية", "القدرة العالية على منافسة المنتجات الأجنبية"], answerText: "نقص العمالة المدربة على التكنولوجيا الحديثة", expl: "نقص العمالة المدربة." },
+        { q: "تلجأ بعض الدول العربية إلى تصدير المواد الخام بدلاً من تصنيعها بسبب:", options: ["توفر المصانع المتطورة", "عدم القدرة على التصنيع", "رغبتها في دعم المنتجات الأجنبية", "وجود فائض كبير في العمالة"], answerText: "عدم القدرة على التصنيع", expl: "عدم القدرة على التصنيع." },
+        { q: "أي من المشكلات التالية ترتبط بالجانب المادي والتجهيزي للإنتاج في بعض الدول العربية:", options: ["توفر العمالة الفنية", "ضعف البنية التحتية", "الإبداع والابتكار", "قوة البنية التحتية"], answerText: "ضعف البنية التحتية", expl: "قوة البنية التحتية." }
+    ];
+
+    let level1Pairs = [];
+    let level2Data = [];
+    let level3Data = [];
+
+    let selectedRight = null;
+    let userMatches = {};
+    let l1UserAnswers = [];
+
+    let currentL2Index = 0;
+    let l2CorrectCount = 0;
+    let l2UserAnswers = [];
+
+    let currentL3Index = 0;
+    let l3CorrectCount = 0;
+    let l3Attempts = 1;
+    let l3UserAnswers = [];
+
+    function shuffleArray(array) {
+        let arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            let j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function initGameData() {
+        level1Pairs = shuffleArray(baseLevel1Pairs);
+        level2Data = shuffleArray(baseLevel2Data);
+        
+        let shuffledL3 = shuffleArray(baseLevel3Data);
+        level3Data = shuffledL3.map(item => {
+            let shuffledOpts = shuffleArray(item.options);
+            let newCorrectIdx = shuffledOpts.indexOf(item.answerText);
+            return {
+                q: item.q,
+                options: shuffledOpts,
+                answer: newCorrectIdx,
+                expl: item.expl
+            };
+        });
+    }
+
+    function showInstructions() {
+        showPanel('instructions-panel');
+    }
+
+    function showLevel1Intro() {
+        showPanel('level-1-intro');
+    }
+
+    function startLevel(level) {
+        if (level === 1) {
+            userMatches = {};
+            selectedRight = null;
+            showPanel('level-1-panel');
+            loadLevel1Matching();
+        } else if (level === 2) {
+            currentL2Index = 0;
+            l2CorrectCount = 0;
+            l2UserAnswers = [];
+            showPanel('level-2-panel');
+            loadL2Question();
+        } else if (level === 3) {
+            currentL3Index = 0;
+            l3CorrectCount = 0;
+            l3UserAnswers = [];
+            showPanel('level-3-panel');
+            loadL3Question();
+        }
+    }
+
+    let shuffledLeft = [];
+
+    function loadLevel1Matching() {
+        const rightContainer = document.getElementById('l1-right-side');
+        const leftContainer = document.getElementById('l1-left-side');
+        
+        rightContainer.innerHTML = "";
+        leftContainer.innerHTML = "";
+
+        shuffledLeft = shuffleArray(level1Pairs);
+
+        level1Pairs.forEach((item) => {
+            let div = document.createElement('div');
+            div.className = "match-item";
+            div.dataset.id = item.id;
+            div.innerHTML = `<span>${item.right}</span> <span id="r-status-${item.id}" style="font-size:0.9rem; font-weight:bold;"></span>`;
+            div.onclick = () => handleRightClick(item.id, div);
+            rightContainer.appendChild(div);
+        });
+
+        shuffledLeft.forEach((item) => {
+            let div = document.createElement('div');
+            div.className = "match-item";
+            div.dataset.leftId = item.id;
+            div.innerHTML = `<span>${item.left}</span>`;
+            div.onclick = () => handleLeftClick(item.id, div);
+            leftContainer.appendChild(div);
+        });
+    }
+
+    function handleRightClick(id, element) {
+        if (userMatches[id] !== undefined) {
+            let prevLeftId = userMatches[id];
+            delete userMatches[id];
+            element.classList.remove('matched');
+            document.getElementById(`r-status-${id}`).innerText = "";
+            
+            let leftEl = document.querySelector(`#l1-left-side [data-left-id='${prevLeftId}']`);
+            if(leftEl) leftEl.classList.remove('matched');
+
+            document.getElementById('l1-submit-btn').style.display = 'none';
+            return;
+        }
+
+        document.querySelectorAll('#l1-right-side .match-item').forEach(el => {
+            if(!el.classList.contains('matched')) el.classList.remove('selected');
+        });
+        element.classList.add('selected');
+        selectedRight = id;
+    }
+
+    function handleLeftClick(leftId, leftElement) {
+        if (selectedRight === null) return;
+        
+        for (let rId in userMatches) {
+            if (userMatches[rId] === leftId) {
+                delete userMatches[rId];
+                let oldR = document.querySelector(`#l1-right-side [data-id='${rId}']`);
+                if(oldR) {
+                    oldR.classList.remove('matched');
+                    document.getElementById(`r-status-${rId}`).innerText = "";
+                }
+            }
+        }
+
+        userMatches[selectedRight] = leftId;
+        
+        let rightEl = document.querySelector(`#l1-right-side [data-id='${selectedRight}']`);
+        rightEl.classList.remove('selected');
+        rightEl.classList.add('matched');
+        
+        document.getElementById(`r-status-${selectedRight}`).innerText = "✨ (تم التوصيل)";
+
+        leftElement.classList.add('matched');
+        selectedRight = null;
+
+        if (Object.keys(userMatches).length === 3) {
+            document.getElementById('l1-submit-btn').style.display = 'inline-block';
+        }
+    }
+
+    function checkLevel1Final() {
+        l1UserAnswers = [];
+        level1Pairs.forEach(item => {
+            let userTargetId = userMatches[item.id];
+            let userTargetObj = level1Pairs.find(p => p.id === parseInt(userTargetId));
+            let userChoiceText = userTargetObj ? userTargetObj.left : "لم يتم التوصيل";
+            let isCorrect = parseInt(userTargetId) === item.id;
+            
+            l1UserAnswers.push({
+                q: `[نشاط التوصيل] ${item.right}`,
+                userAns: userChoiceText,
+                correctAns: item.left,
+                isCorrect: isCorrect,
+                expl: `الإجابة الصحيحة: ${item.left}`
+            });
+        });
+
+        let allCorrect = l1UserAnswers.every(item => item.isCorrect);
+
+        showPanel('level-1-result');
+        const title = document.getElementById('l1-result-title');
+        const desc = document.getElementById('l1-result-desc');
+        const btn = document.getElementById('l1-action-btn');
+        const badge = document.getElementById('l1-badge');
+
+        if (allCorrect) {
+            badge.style.display = 'block';
+            title.innerHTML = "🎉 مبروك لقد نجحت في المستوى الأول 🥇";
+            desc.innerHTML = "🌟 أحسنت استمر في رحلتك للوصول إلى المستوى التالي.";
+            totalScore += 6; 
+            btn.innerHTML = "الانتقال إلى المستوى الثاني ➡️";
+            btn.onclick = () => showPanel('level-2-intro');
+        } else {
+            badge.style.display = 'none';
+            title.innerHTML = "❌ لم ينجح في المستوى الأول";
+            desc.innerHTML = "📌 يجب أن تعيده مرة أخرى حتى تتمكن من الدخول إلى المستوى التالي.";
+            btn.innerHTML = "🔄 أعد المستوى الأول";
+            btn.onclick = () => startLevel(1);
+        }
+    }
+
+    function loadL2Question() {
+        if (currentL2Index >= level2Data.length) {
+            showL2Result();
+            return;
+        }
+        const q = level2Data[currentL2Index];
+        const container = document.getElementById('q2-container');
+
+        container.innerHTML = `
+            <div class="question-box">
+                <h3>📌 السؤال ${currentL2Index + 1} من 5</h3>
+                <p>${q.q}</p>
+                <button class="btn" style="background: var(--light-green); margin-left: 10px;" onclick="checkL2Answer(true)">✅ صحيحة</button>
+                <button class="btn" style="background: var(--danger-red);" onclick="checkL2Answer(false)">❌ خاطئة</button>
+                <div id="l2-feedback" class="feedback"></div>
+                <div style="margin-top: 15px;">
+                    <button id="l2-next-btn" class="btn" style="display:none;" onclick="nextL2Question()">السؤال التالي ➡️</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function checkL2Answer(userAns) {
+        const q = level2Data[currentL2Index];
+        const feedbackDiv = document.getElementById('l2-feedback');
+
+        l2UserAnswers.push({ 
+            q: `[صح وخطأ] ${q.q}`, 
+            userAns: userAns, 
+            correctAns: q.ans, 
+            isCorrect: userAns === q.ans,
+            expl: q.expl 
+        });
+
+        const buttons = document.querySelectorAll('#q2-container button:not(#l2-next-btn)');
+        buttons.forEach(b => b.disabled = true);
+
+        if (userAns === q.ans) {
+            feedbackDiv.innerHTML = `🎉 الإجابة صحيحة! ${q.expl} (+2 درجة ⭐)`;
+            feedbackDiv.className = "feedback correct";
+            l2CorrectCount++;
+            totalScore += 2;
+        } else {
+            feedbackDiv.innerHTML = "❌ الإجابة خطأ.";
+            feedbackDiv.className = "feedback wrong";
+        }
+
+        document.getElementById('l2-next-btn').style.display = 'inline-block';
+    }
+
+    function nextL2Question() {
+        currentL2Index++;
+        loadL2Question();
+    }
+
+    function showL2Result() {
+        showPanel('level-2-result');
+        const title = document.getElementById('l2-result-title');
+        const desc = document.getElementById('l2-result-desc');
+        const btn = document.getElementById('l2-action-btn');
+        const badge = document.getElementById('l2-badge');
+
+        if (l2CorrectCount >= 3) {
+            badge.style.display = 'block';
+            title.innerHTML = "🎉 مبروك لقد نجحت في المستوى الثاني 🥈";
+            desc.innerHTML = "🌟 أحسنت استمر في رحلتك للوصول إلى المستوى التالي.";
+            btn.innerHTML = "الانتقال إلى المستوى الثالث ➡️";
+            btn.onclick = () => showPanel('level-3-intro');
+        } else {
+            badge.style.display = 'none';
+            title.innerHTML = "❌ لم ينجح في المستوى الثاني";
+            desc.innerHTML = "📌 يجب أن تعيده مرة أخرى حتى تتمكن من الدخول إلى المستوى التالي.";
+            btn.innerHTML = "🔄 أعد المستوى الثاني";
+            btn.onclick = () => startLevel(2);
+        }
+    }
+
+    function loadL3Question() {
+        if (currentL3Index >= level3Data.length) {
+            showL3Result();
+            return;
+        }
+        l3Attempts = 1;
+        const q = level3Data[currentL3Index];
+        const container = document.getElementById('q3-container');
+
+        let html = `
+            <div class="question-box">
+                <h3>📌 السؤال ${currentL3Index + 1} من 21</h3>
+                <p>${q.q}</p>
+                <ul class="options-list">
+        `;
+        q.options.forEach((opt, idx) => {
+            html += `<li onclick="checkL3Answer(${idx}, this)">${opt}</li>`;
+        });
+        html += `</ul>
+                 <div id="l3-feedback" class="feedback"></div>
+                 <div style="margin-top: 15px;">
+                     <button id="l3-next-btn" class="btn" style="display:none;" onclick="nextL3Question()">السؤال التالي ➡️</button>
+                 </div>
+            </div>`;
+        container.innerHTML = html;
+    }
+
+    function checkL3Answer(selectedIdx, liElement) {
+        const q = level3Data[currentL3Index];
+        const feedbackDiv = document.getElementById('l3-feedback');
+        const options = document.querySelectorAll('#q3-container .options-list li');
+        let isCorrectChoice = (selectedIdx === q.answer);
+
+        if (isCorrectChoice) {
+            if (l3Attempts === 1) {
+                l3CorrectCount++;
+                totalScore += 2;
+            }
+            options.forEach(opt => opt.style.pointerEvents = 'none');
+            liElement.style.background = 'var(--light-green)';
+            liElement.style.color = 'white';
+            feedbackDiv.innerHTML = "🎉 الإجابة صحيحة! أحسنت يا بطل (+2 درجة ⭐)";
+            feedbackDiv.className = "feedback correct";
+            
+            l3UserAnswers.push({ q: `[اختيار من متعدد] ${q.q}`, userAns: q.options[selectedIdx], correctAns: q.options[q.answer], isCorrect: true, expl: q.expl });
+            document.getElementById('l3-next-btn').style.display = 'inline-block';
+        } else {
+            if (l3Attempts === 1) {
+                l3Attempts++;
+                liElement.style.background = 'var(--danger-red)';
+                liElement.style.color = 'white';
+                liElement.style.pointerEvents = 'none';
+                feedbackDiv.innerHTML = "❌ الإجابة خطأ. حاول مرة أخرى";
+                feedbackDiv.className = "feedback wrong";
+            } else {
+                options.forEach(opt => opt.style.pointerEvents = 'none');
+                liElement.style.background = 'var(--danger-red)';
+                liElement.style.color = 'white';
+                feedbackDiv.innerHTML = "⚠️ انتهت محاولاتك لهذا السؤال. الانتقال للسؤال التالي.";
+                feedbackDiv.className = "feedback wrong";
+
+                l3UserAnswers.push({ q: `[اختيار من متعدد] ${q.q}`, userAns: q.options[selectedIdx], correctAns: q.options[q.answer], isCorrect: false, expl: q.expl });
+                document.getElementById('l3-next-btn').style.display = 'inline-block';
+            }
+        }
+    }
+
+    function nextL3Question() {
+        currentL3Index++;
+        loadL3Question();
+    }
+
+    function showL3Result() {
+        if (l3CorrectCount >= 15) {
+            showGlobalReview();
+        } else {
+            showPanel('level-3-result');
+            const title = document.getElementById('l3-result-title');
+            const desc = document.getElementById('l3-result-desc');
+            const btn = document.getElementById('l3-action-btn');
+            const badge = document.getElementById('l3-badge');
+
+            badge.style.display = 'none';
+            title.innerHTML = "❌ لم ينجح !";
+            desc.innerHTML = "📌 يجب أن تعيده مرة أخرى حتى تتمكن من الدخول إلى شريحة النهاية ومعرفة النتيجة.";
+            btn.innerHTML = "🔄 أعد المستوى الثالث";
+            btn.onclick = () => startLevel(3);
+        }
+    }
+
+    function populateReviewList(containerId) {
+        const reviewList = document.getElementById(containerId);
+        reviewList.innerHTML = "";
+
+        // دمج نتائج المستويات الثلاثة بالكامل
+        let allAnswers = [...l1UserAnswers, ...l2UserAnswers, ...l3UserAnswers];
+
+        allAnswers.forEach((item, index) => {
+            let div = document.createElement('div');
+            div.className = `review-item ${item.isCorrect ? 'correct-ans' : 'wrong-ans'}`;
+            
+            let userAnsText = typeof item.userAns === 'boolean' ? (item.userAns ? 'صحيحة' : 'خاطئة') : item.userAns;
+            let correctAnsText = typeof item.correctAns === 'boolean' ? (item.correctAns ? 'صحيحة' : 'خاطئة') : item.correctAns;
+
+            div.innerHTML = `
+                <p><strong>س${index + 1}:</strong> ${item.q}</p>
+                <p>إجابتك: <strong>${userAnsText}</strong> | الإجابة الصحيحة: <strong>${correctAnsText}</strong></p>
+                <p style="font-size: 0.95rem; color: #555;">💡 <em>${item.expl}</em></p>
+            `;
+            reviewList.appendChild(div);
+        });
+    }
+
+    function showGlobalReview() {
+        showPanel('global-review-panel');
+        populateReviewList('global-review-list');
+    }
+
+    function showFinalPanelFromReview() {
+        showPanel('final-panel');
+        document.getElementById('final-score-text').innerHTML = `🏆 نتيجتك النهائية: ${totalScore} من 58 درجة`;
+        populateReviewList('final-summary-list');
+    }
+
+    function showPanel(panelId) {
+        document.querySelectorAll('.panel').forEach(s => s.classList.remove('active'));
+        document.getElementById(panelId).classList.add('active');
+    }
+
+    function restartGame() {
+        totalScore = 0;
+        l1UserAnswers = [];
+        l2UserAnswers = [];
+        l3UserAnswers = [];
+        initGameData();
+        showPanel('welcome-panel');
+    }
+
+    initGameData();
+</script>
+
+</body>
+</html>
